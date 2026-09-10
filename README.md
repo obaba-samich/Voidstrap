@@ -41,6 +41,9 @@ Leave a star if you like the project! ⭐️
 > In the meantime, you can use **[AppleBlox](https://github.com/AppleBlox/appleblox)** *(for macOS)* or **[Sober](https://sober.vinegarhq.org/)** *(for Linux)*.  
 > More experienced Linux users can also try tools like **[Lution](https://github.com/wookhq/Lution)**.
 
+> [!WARNING]
+> Voidstrap is not an exploit and never will be one. We are not considered an exploit. We are here to provide users with more freedom, features, and support for Roblox.
+
 ## Installation
 
 1. Download the latest version
