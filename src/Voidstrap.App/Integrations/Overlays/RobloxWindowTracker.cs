@@ -511,14 +511,21 @@ namespace Voidstrap.Integrations.Overlays
                     nint activeWindow = Voidstrap.Platform.Linux.LinuxWindowInterop.GetActiveTopLevelWindow();
                     nint inputWindow = Voidstrap.Platform.Linux.LinuxWindowInterop.GetFocusedTopLevelWindow();
                     nint anchor = Voidstrap.Platform.Linux.LinuxWindowInterop.FocusAnchor;
-                    bool nativeWindowActive =
+                    bool overlayActive =
                         OverlayDiagnostics.IsOverlayHandle(activeWindow)
                         || (anchor != 0 && (OverlayDiagnostics.IsOverlayHandle(inputWindow) || inputWindow == anchor))
-                        || (
-                            Voidstrap.Platform.Linux.LinuxWindowInterop.HasFocusAnchor
-                                ? Voidstrap.Platform.Linux.LinuxWindowInterop.IsFocusAnchorHolding()
-                                : Voidstrap.Platform.Linux.LinuxWindowInterop.IsNativeWindowActive()
-                        );
+                        || (Voidstrap.Platform.Linux.LinuxWindowInterop.HasFocusAnchor && Voidstrap.Platform.Linux.LinuxWindowInterop.IsFocusAnchorHolding());
+                    if (Voidstrap.Platform.Linux.LinuxWaylandToplevels.TryGetRuntimeWindow(
+                            out int soberLeft,
+                            out int soberTop,
+                            out int soberWidth,
+                            out int soberHeight,
+                            out bool soberActive
+                        ))
+                        return new RobloxWindowRect(IntPtr.Zero, soberLeft, soberTop, soberWidth, soberHeight, true, soberActive || overlayActive);
+                    bool nativeWindowActive =
+                        overlayActive
+                        || (!Voidstrap.Platform.Linux.LinuxWindowInterop.HasFocusAnchor && Voidstrap.Platform.Linux.LinuxWindowInterop.IsNativeWindowActive());
                     return new RobloxWindowRect(
                         IntPtr.Zero,
                         monitorLeft,
