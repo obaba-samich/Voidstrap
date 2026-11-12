@@ -5,7 +5,7 @@ public enum RobloxFlags {
     static let relative = "Library/Application Support/ClientSettings/ClientAppSettings.json"
     static let ixp = "Library/Application Support/ClientSettings/IxpSettings.json"
     static let ixpTag = ";1;Voidstrap;Voidstrap;0;voidstrap"
-    static let markers = ["Library/Preferences/\(bundleId).plist", "Library/Caches/\(bundleId)", "Library/Application Support/ClientSettings", "Library/Caches/Roblox"]
+    static let markers = ["Library/Preferences/\(bundleId).plist", "Library/Caches/\(bundleId)"]
     nonisolated(unsafe) static var lastReport = ""
 
     static var groups: [String] {
