@@ -124,11 +124,23 @@ public enum RobloxFlags {
             out.append("Roblox log files: " + logs.map { $0.0.path.replacingOccurrences(of: lib.path, with: "") }.joined(separator: " "))
             for (url, _) in logs.sorted(by: { $0.1 > $1.1 }).prefix(2) {
                 guard let text = try? String(contentsOf: url, encoding: .utf8) else { continue }
-                let hits = text.split(separator: "\n").filter { $0.contains("ClientSettings") || $0.contains("ClientAppSettings") || $0.contains("LocalSettings") }
+                let hits = text.split(separator: "\n").filter { line in logTerms.contains { line.contains($0) } }
                 out.append("\(url.lastPathComponent): " + hits.prefix(30).joined(separator: " | "))
             }
+            out.append(ixpReport(container))
         }
         return out
+    }
+
+    static let logTerms = ["ClientSettings", "ClientAppSettings", "LocalSettings", "Ixp", "IXP", "FlagCache", "SkyGray"]
+
+    static func ixpReport(_ container: URL) -> String {
+        let file = container.appendingPathComponent(ixp)
+        guard let data = try? Data(contentsOf: file),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return "IxpSettings: missing or unreadable" }
+        let ours = object.filter { ($0.value as? String)?.hasSuffix(ixpTag) == true }.keys.sorted()
+        let date = (try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate).map { "\($0)" } ?? "unknown"
+        return "IxpSettings: \(object.count) entries, modified \(date), ours: \(ours.isEmpty ? "none" : ours.joined(separator: " "))"
     }
 
     static func clearCache(_ container: URL) {
