@@ -168,7 +168,6 @@ public enum RobloxFlags {
                 Paths.ensure(file.deletingLastPathComponent())
                 chflags(file.path, 0)
                 try data.write(to: file, options: .atomic)
-                chflags(file.path, UInt32(UF_IMMUTABLE))
                 try writeIxp(applicable, container)
                 clearCache(container)
                 written += 1
