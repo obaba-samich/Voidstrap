@@ -3,6 +3,8 @@ import Foundation
 public enum RobloxFlags {
     static let bundleId = "com.roblox.robloxmobile"
     static let relative = "Library/Application Support/ClientSettings/ClientAppSettings.json"
+    static let ixp = "Library/Application Support/ClientSettings/IxpSettings.json"
+    static let ixpTag = ";1;Voidstrap;Voidstrap;0;voidstrap"
     static let markers = ["Library/Preferences/\(bundleId).plist", "Library/Caches/\(bundleId)", "Library/Application Support/ClientSettings", "Library/Caches/Roblox"]
     nonisolated(unsafe) static var lastReport = ""
 
@@ -131,15 +133,33 @@ public enum RobloxFlags {
 
     static func clearCache(_ container: URL) {
         let fm = FileManager.default
-        guard let walk = fm.enumerator(at: container.appendingPathComponent("Library", isDirectory: true), includingPropertiesForKeys: nil) else { return }
-        for case let url as URL in walk where url.lastPathComponent.lowercased().hasPrefix("flag_cache") {
-            try? fm.removeItem(at: url)
+        for folder in ["Library", "tmp"] {
+            guard let walk = fm.enumerator(at: container.appendingPathComponent(folder, isDirectory: true), includingPropertiesForKeys: nil) else { continue }
+            for case let url as URL in walk where url.lastPathComponent.lowercased().hasPrefix("flag_cache") {
+                try? fm.removeItem(at: url)
+            }
         }
+    }
+
+    static func writeIxp(_ flags: [FastFlag], _ container: URL) throws {
+        let file = container.appendingPathComponent(ixp)
+        var object: [String: Any] = [:]
+        if let data = try? Data(contentsOf: file) {
+            guard let existing = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw ZipError("IxpSettings.json is not a JSON object.")
+            }
+            object = existing.filter { ($0.value as? String)?.hasSuffix(ixpTag) != true }
+        }
+        for flag in flags {
+            object[flag.name + "_IXPValue"] = (flag.kind == .bool ? flag.value.lowercased() : flag.value) + ixpTag
+        }
+        try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]).write(to: file, options: .atomic)
     }
 
     @discardableResult
     public static func apply(_ flags: [FastFlag]) -> Int {
-        let data = FlagStore.encode(flags.filter(\.appliesOnIos))
+        let applicable = flags.filter(\.appliesOnIos)
+        let data = FlagStore.encode(applicable)
         let found = containers
         var written = 0
         for container in found {
@@ -149,6 +169,7 @@ public enum RobloxFlags {
                 chflags(file.path, 0)
                 try data.write(to: file, options: .atomic)
                 chflags(file.path, UInt32(UF_IMMUTABLE))
+                try writeIxp(applicable, container)
                 clearCache(container)
                 written += 1
             } catch {
