@@ -7,8 +7,8 @@ struct VoidstrapApp: App {
 
     init() {
         Paths.ensure(Paths.documents)
-        for line in RobloxFlags.robloxLogLines() { Log.write("RobloxFlags::robloxLog", line) }
-        for name in ["voidstrap-regmap.bin"] {
+        RobloxData.removeLeftovers()
+        for name in ["voidstrap-regmap.bin", "fflags.json"] {
             try? FileManager.default.removeItem(at: Paths.shared.appendingPathComponent(name))
         }
         Log.write("App::Init", "Voidstrap \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "") started, LiveContainer \(Paths.isLiveContainer)")
@@ -71,7 +71,7 @@ struct RootView: View {
             case .home: HomeView()
             case .library: LibraryView()
             case .mods: ModsView()
-            case .flags: FlagsView()
+            case .roblox: RobloxSettingsView()
             case .settings: SettingsView()
             }
         }
@@ -212,7 +212,7 @@ struct ActionBar: View {
                     .buttonStyle(StandardButtonStyle())
                     .accessibilityLabel(Loc.t("Launch Roblox"))
                     Button { model.patch() } label: {
-                        Text(model.flagsDirty ? "Save & Apply" : "Apply Roblox").lineLimit(1).minimumScaleFactor(0.7)
+                        Text(loc: "Apply Roblox").lineLimit(1).minimumScaleFactor(0.7)
                     }
                     .buttonStyle(PrimaryButtonStyle())
                 }

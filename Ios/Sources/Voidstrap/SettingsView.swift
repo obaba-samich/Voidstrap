@@ -101,7 +101,7 @@ struct SettingsView: View {
                     .disabled(model.patched == nil || model.busy)
                     .accessibilityAddTraits(.isButton)
                 RowDivider()
-                Row(symbol: "doc.text", title: "View log", detail: "Voidstrap and FastFlag loader activity.") { Chevron() }
+                Row(symbol: "doc.text", title: "View log", detail: "Voidstrap and Roblox settings activity.") { Chevron() }
                     .onTapGesture { showingLog = true }
                     .accessibilityAddTraits(.isButton)
             }

@@ -4,11 +4,11 @@ public enum LiveInstall {
     public static let folder = "Roblox.app"
 
     static var root: URL? {
-        RobloxFlags.roots.first { FileManager.default.fileExists(atPath: $0.appendingPathComponent("Applications").path) }
+        RobloxData.roots.first { FileManager.default.fileExists(atPath: $0.appendingPathComponent("Applications").path) }
     }
 
     public static var ready: Bool {
-        guard let root, let info = RobloxFlags.plist(root.appendingPathComponent("Applications/\(folder)/LCAppInfo.plist")) else { return false }
+        guard let root, let info = RobloxData.plist(root.appendingPathComponent("Applications/\(folder)/LCAppInfo.plist")) else { return false }
         return (info["LCPatchRevision"] as? Int ?? 0) > 0
     }
 
@@ -50,7 +50,7 @@ public enum LiveInstall {
                 done += 1
                 if done % 200 == 0 { status("Installing Roblox in LiveContainer", Double(done) / Double(files.count)) }
             }
-            var info = RobloxFlags.plist(target.appendingPathComponent("LCAppInfo.plist")) ?? [:]
+            var info = RobloxData.plist(target.appendingPathComponent("LCAppInfo.plist")) ?? [:]
             if info["LCDataUUID"] == nil { info["LCDataUUID"] = UUID().uuidString }
             info["LCPatchRevision"] = -1
             let data = try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)

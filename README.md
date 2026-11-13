@@ -542,9 +542,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\publish-all.ps1 -Only ios 
 
 On Linux or macOS, use `pwsh -NoProfile -File ./publish-all.ps1 -Only ios -NoPause`. Output: `PublishedBuilds/iOS/Voidstrap-<version>.ipa`, using the version in `Directory.Build.props`.
 
-**FastFlags on iOS**
+**Roblox settings on iOS**
 
-Voidstrap writes FastFlags to `Library/Application Support/ClientSettings/ClientAppSettings.json`, the file Roblox reads for local settings. This needs Roblox installed in LiveContainer next to Voidstrap, since iOS keeps other apps' files private. Launch Roblox there once so its data folder exists. Nothing is injected into Roblox.
+Roblox on iOS reads `ClientAppSettings.json` but denies every FastFlag in it, so the iOS app changes Roblox's own settings instead: frame rate limit, performance stats and reduced motion. Voidstrap edits only those values in `Library/Application Support/GlobalBasicSettings_13.xml` each time it launches Roblox. This needs Roblox installed in LiveContainer next to Voidstrap, since iOS keeps other apps' files private. Launch Roblox there once so its settings file exists. Nothing is injected into Roblox.
 
 </details>
 

@@ -14,7 +14,7 @@ struct HomeView: View {
     }
 
     var body: some View {
-        Page(title: "Home", subtitle: "Apply your mods and FastFlags to Roblox, then install it with your sideloader.") {
+        Page(title: "Home", subtitle: "Apply your mods to Roblox, then install it with your sideloader.") {
             FeaturedBanner()
             if let release = model.update {
                 Card {
@@ -47,7 +47,7 @@ struct HomeView: View {
                     tint: model.robloxIpa == nil ? Palette.textTertiary : Palette.success)
                 RowDivider()
                 Row(symbol: "checkmark.seal", title: model.patched == nil ? "Not patched yet" : "Patched Roblox is ready",
-                    detail: model.lastResult.map { "\($0.modFiles) mod files and \($0.flagCount) FastFlags from your last apply." }
+                    detail: model.lastResult.map { "\($0.modFiles) mod files from your last apply." }
                         ?? (model.patched == nil ? "Tap Apply Roblox to build your copy." : "Tap Install to send it to LiveContainer, SideStore or Files."),
                     tint: model.patched == nil ? Palette.textTertiary : Palette.success)
                 RowDivider()
@@ -55,9 +55,9 @@ struct HomeView: View {
                     detail: "Manage them on the Mods page.") { Chevron() }
                     .onTapGesture { model.tab = .mods }
                 RowDivider()
-                Row(symbol: "flag", title: "\(model.flags.filter(\.appliesOnIos).count) FastFlags",
-                    detail: "Applied while Roblox runs.") { Chevron() }
-                    .onTapGesture { model.tab = .flags }
+                Row(symbol: "slider.horizontal.3", title: "\(model.robloxSettings.count) Roblox settings",
+                    detail: "Set when you launch Roblox from Voidstrap.") { Chevron() }
+                    .onTapGesture { model.tab = .roblox }
             }
 
             SectionTitle(text: "Continue Playing")

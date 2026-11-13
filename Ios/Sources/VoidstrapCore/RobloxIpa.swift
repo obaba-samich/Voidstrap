@@ -17,7 +17,6 @@ public struct RobloxRelease: Equatable {
 public struct PatchResult: Sendable {
     public let output: URL
     public let modFiles: Int
-    public let flagCount: Int
     public let robloxVersion: String
 }
 
@@ -123,7 +122,7 @@ public enum RobloxIpa {
         }
     }
 
-    public static func patch(ipa: URL, mods: [ModPack], flags: [FastFlag], settings: AppSettings, presets: PresetState = PresetState(), assets: URL? = nil, status: @escaping PatchStatus) throws -> PatchResult {
+    public static func patch(ipa: URL, mods: [ModPack], settings: AppSettings, presets: PresetState = PresetState(), assets: URL? = nil, status: @escaping PatchStatus) throws -> PatchResult {
         let ident = "RobloxIpa::patch"
         let started = Date()
         let zip = try ZipReader(url: ipa)
@@ -145,15 +144,11 @@ public enum RobloxIpa {
         }
         let modFileCount = replacements.count
 
-        let applicable = flags.filter(\.appliesOnIos)
-        let flagData = FlagStore.encode(applicable)
-        for rel in RobloxFlags.bundleFiles { replacements[IpaPatcher.appRoot + rel] = flagData }
-
         Paths.ensure(Paths.patched.deletingLastPathComponent())
         try IpaPatcher.patch(ipa: ipa, replacements: replacements, output: Paths.patched, status: status)
         if !settings.keepOriginalIpa { try? FileManager.default.removeItem(at: ipa) }
-        Log.write(ident, "Patched Roblox \(version) with \(modFileCount) mod files from \(mods.count) enabled mod packs, \(applicable.count) of \(flags.count) FastFlags apply on iOS, in \(String(format: "%.1f", Date().timeIntervalSince(started))) seconds")
-        return PatchResult(output: Paths.patched, modFiles: modFileCount, flagCount: applicable.count, robloxVersion: version)
+        Log.write(ident, "Patched Roblox \(version) with \(modFileCount) mod files from \(mods.count) enabled mod packs in \(String(format: "%.1f", Date().timeIntervalSince(started))) seconds")
+        return PatchResult(output: Paths.patched, modFiles: modFileCount, robloxVersion: version)
     }
 }
 
