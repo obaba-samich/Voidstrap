@@ -39,7 +39,7 @@ final class AppModel: ObservableObject {
     @Published var settings = AppSettings.load() { didSet { if settings != oldValue { settings.save() } } }
     @Published var mods = ModStore.load()
     @Published var presets = PresetState.load() { didSet { if presets != oldValue { presets.save() } } }
-    @Published var robloxSettings = RobloxSettings.load() { didSet { if robloxSettings != oldValue { robloxSettings.save() } } }
+    @Published var robloxSettings = RobloxSettings.load() { didSet { if robloxSettings != oldValue { robloxSettings.save(); RobloxSettings.apply(robloxSettings) } } }
     @Published var games = LibraryStore.load()
     @Published var robloxIpa = RobloxIpa.cached()
     @Published var patched: URL? = FileManager.default.fileExists(atPath: Paths.patched.path) ? Paths.patched : nil

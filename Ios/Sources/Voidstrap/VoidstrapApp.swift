@@ -8,6 +8,7 @@ struct VoidstrapApp: App {
     init() {
         Paths.ensure(Paths.documents)
         RobloxData.removeLeftovers()
+        RobloxSettings.apply(RobloxSettings.load())
         for name in ["voidstrap-regmap.bin", "fflags.json"] {
             try? FileManager.default.removeItem(at: Paths.shared.appendingPathComponent(name))
         }

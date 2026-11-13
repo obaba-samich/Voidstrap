@@ -4,8 +4,15 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
     public var framerateCap: Int?
     public var performanceStats: Bool?
     public var reducedMotion: Bool?
+    public var masterVolume: Double?
+    public var cameraInverted: Bool?
+    public var vignette: Bool?
+    public var textSize: Int?
+    public var menuTransparency: Double?
+    public var haptics: Double?
 
     public static let framerateCaps = [-1, 30, 60, 120]
+    public static let textSizes = 1...4
     static let prefix = "GlobalBasicSettings_"
     nonisolated(unsafe) static var lastReport = ""
 
@@ -19,10 +26,18 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
         if let framerateCap { out.append(("FramerateCap", String(framerateCap))) }
         if let performanceStats { out.append(("PerformanceStatsVisible", performanceStats ? "true" : "false")) }
         if let reducedMotion { out.append(("ReducedMotion", reducedMotion ? "true" : "false")) }
+        if let masterVolume { out.append(("MasterVolume", number(masterVolume))) }
+        if let cameraInverted { out.append(("CameraYInverted", cameraInverted ? "true" : "false")) }
+        if let vignette { out.append(("VignetteEnabled", vignette ? "true" : "false")) }
+        if let textSize { out.append(("PreferredTextSize", String(textSize))) }
+        if let menuTransparency { out.append(("PreferredTransparency", number(menuTransparency))) }
+        if let haptics { out.append(("HapticStrength", number(haptics))) }
         return out
     }
 
     public var count: Int { values.count }
+
+    func number(_ value: Double) -> String { String(format: "%g", min(max(value, 0), 1)) }
 
     static func file(_ container: URL) -> URL? {
         let support = container.appendingPathComponent("Library/Application Support", isDirectory: true)
