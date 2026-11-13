@@ -3,7 +3,7 @@ import UIKit
 import VoidstrapCore
 
 enum Tab: String, CaseIterable, Identifiable {
-    case home, library, mods, flags, settings
+    case home, library, mods, roblox, settings
     var id: String { rawValue }
 
     var title: String {
@@ -11,7 +11,7 @@ enum Tab: String, CaseIterable, Identifiable {
         case .home: return "Home"
         case .library: return "Library"
         case .mods: return "Mods"
-        case .flags: return "FastFlags"
+        case .roblox: return "Roblox"
         case .settings: return "Settings"
         }
     }
@@ -21,7 +21,7 @@ enum Tab: String, CaseIterable, Identifiable {
         case .home: return "house"
         case .library: return "square.grid.2x2"
         case .mods: return "paintbrush"
-        case .flags: return "flag"
+        case .roblox: return "slider.horizontal.3"
         case .settings: return "gearshape"
         }
     }
@@ -38,9 +38,8 @@ final class AppModel: ObservableObject {
     @Published var tab: Tab = .home
     @Published var settings = AppSettings.load() { didSet { if settings != oldValue { settings.save() } } }
     @Published var mods = ModStore.load()
-    @Published var flags = FlagStore.load()
     @Published var presets = PresetState.load() { didSet { if presets != oldValue { presets.save() } } }
-    @Published var flagsDirty = false
+    @Published var robloxSettings = RobloxSettings.load() { didSet { if robloxSettings != oldValue { robloxSettings.save() } } }
     @Published var games = LibraryStore.load()
     @Published var robloxIpa = RobloxIpa.cached()
     @Published var patched: URL? = FileManager.default.fileExists(atPath: Paths.patched.path) ? Paths.patched : nil
@@ -102,43 +101,6 @@ final class AppModel: ObservableObject {
         saveMods()
     }
 
-    func saveFlags() {
-        FlagStore.save(flags)
-        flagsDirty = false
-        show("FastFlags saved")
-    }
-
-    func setFlag(_ flag: FastFlag, replacing old: String? = nil) {
-        if let old { flags.removeAll { $0.name == old } }
-        flags.removeAll { $0.name == flag.name }
-        flags.append(flag)
-        flags.sort { $0.name.lowercased() < $1.name.lowercased() }
-        flagsDirty = true
-    }
-
-    func removeFlag(_ name: String) {
-        flags.removeAll { $0.name == name }
-        flagsDirty = true
-    }
-
-    func importFlags(_ data: Data) {
-        do {
-            let incoming = try FlagStore.parse(data)
-            for flag in incoming { setFlag(flag) }
-            show(incoming.count == 1 ? "Imported 1 FastFlag" : "Imported \(incoming.count) FastFlags")
-        } catch {
-            show(error.localizedDescription, error: true)
-        }
-    }
-
-    func flag(_ name: String) -> String? { flags.first { $0.name == name }?.value }
-
-    func putFlag(_ name: String, _ value: String?) {
-        if let value { setFlag(FastFlag(name: name, value: value)) } else if flag(name) != nil { removeFlag(name) }
-        FlagStore.save(flags)
-        flagsDirty = false
-    }
-
     func saveGames() { LibraryStore.save(games) }
 
     func addGame(_ input: String) async {
@@ -181,9 +143,8 @@ final class AppModel: ObservableObject {
     }
 
     func launchUrl(_ url: URL) {
-        if flagsDirty { FlagStore.save(flags); flagsDirty = false }
-        if RobloxFlags.apply(flags) == 0, !flags.isEmpty {
-            show("FastFlags could not reach Roblox. Press Apply Roblox to install it in LiveContainer.", error: true)
+        if robloxSettings.count > 0, RobloxSettings.apply(robloxSettings) == 0 {
+            show("Roblox settings were not applied. Open Roblox once from LiveContainer, then launch from here again.", error: true)
         }
         UIApplication.shared.open(url) { [weak self] opened in
             if !opened {
@@ -208,9 +169,7 @@ final class AppModel: ObservableObject {
     }
 
     func patch() {
-        if flagsDirty { FlagStore.save(flags); flagsDirty = false }
         let enabled = mods.filter(\.enabled)
-        let flags = flags
         let settings = settings
         let presets = presets
         let assets = Bundle.module.url(forResource: "ModAssets", withExtension: nil)
@@ -224,7 +183,7 @@ final class AppModel: ObservableObject {
                 await MainActor.run { model.robloxIpa = ipa }
             }
             let result = try await Task.detached(priority: .userInitiated) {
-                try RobloxIpa.patch(ipa: ipa, mods: enabled, flags: flags, settings: settings, presets: presets, assets: assets) { text, value in model.report(text, value) }
+                try RobloxIpa.patch(ipa: ipa, mods: enabled, settings: settings, presets: presets, assets: assets) { text, value in model.report(text, value) }
             }.value
             var installed = false
             if Paths.isLiveContainer {
@@ -232,7 +191,6 @@ final class AppModel: ObservableObject {
                     _ = try LiveInstall.install(ipa: result.output) { text, value in model.report(text, value) }
                     return true
                 }.value
-                RobloxFlags.apply(flags)
             }
             await MainActor.run {
                 model.patched = result.output

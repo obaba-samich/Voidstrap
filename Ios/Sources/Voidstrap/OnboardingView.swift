@@ -7,11 +7,11 @@ struct OnboardingView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var step = 0
     private let steps: [(String, String, String)] = [
-        ("bolt.fill", "Welcome to Voidstrap", "Mods, FastFlags and your game library for Roblox on iOS. This quick setup gets everything ready."),
+        ("bolt.fill", "Welcome to Voidstrap", "Mods, Roblox settings and your game library for Roblox on iOS. This quick setup gets everything ready."),
         ("paintpalette", "Appearance", "Pick a theme. You can change it any time in Settings."),
-        ("arrow.down.circle", "Get Roblox", "Voidstrap downloads Roblox, applies your mods and FastFlags, and installs it straight into LiveContainer for you."),
+        ("arrow.down.circle", "Get Roblox", "Voidstrap downloads Roblox, applies your mods, and installs it straight into LiveContainer for you."),
         ("apps.iphone", "Add to Home Screen", "iOS does not let apps add themselves. In LiveContainer, long press Voidstrap and choose Add to Home Screen or Create App Clip to open it straight from your home screen."),
-        ("checkmark.circle", "You are all set", "Apply Roblox from the bottom bar whenever you change mods or FastFlags.")
+        ("checkmark.circle", "You are all set", "Apply Roblox from the bottom bar whenever you change mods.")
     ]
 
     var body: some View {
@@ -76,7 +76,7 @@ struct OnboardingView: View {
         case 4:
             Card {
                 Button { model.launchRoblox(); finish() } label: {
-                    Row(symbol: "play.fill", title: "Launch Roblox", detail: "Opens Roblox with your FastFlags") { Chevron() }
+                    Row(symbol: "play.fill", title: "Launch Roblox", detail: "Opens Roblox with your settings") { Chevron() }
                 }
                 .buttonStyle(.plain)
             }

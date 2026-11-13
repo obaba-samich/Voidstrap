@@ -16,13 +16,12 @@ public enum Paths {
         shared.standardizedFileURL.path != documents.standardizedFileURL.path
     }
 
-    public static let flags = shared.appendingPathComponent("fflags.json")
-
     public static let mods = documents.appendingPathComponent("Mods", isDirectory: true)
     public static let modIndex = documents.appendingPathComponent("mods.json")
     public static let roblox = documents.appendingPathComponent("Roblox", isDirectory: true)
     public static let patched = documents.appendingPathComponent("Roblox-Voidstrap.ipa")
     public static let settings = documents.appendingPathComponent("settings.json")
+    public static let robloxSettings = documents.appendingPathComponent("robloxsettings.json")
     public static let library = documents.appendingPathComponent("library.json")
     public static let log = documents.appendingPathComponent("voidstrap.log")
     public static let work = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
