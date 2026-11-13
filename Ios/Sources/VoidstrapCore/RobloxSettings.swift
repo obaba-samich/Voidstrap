@@ -10,9 +10,18 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
     public var textSize: Int?
     public var menuTransparency: Double?
     public var haptics: Double?
+    public var graphicsQuality: Int?
+    public var graphicsMode: Int?
+    public var touchMovement: Int?
+    public var touchCamera: Int?
+    public var chatTranslation: Bool?
+    public var voiceVolume: Double?
 
     public static let framerateCaps = [-1, 30, 60, 120]
     public static let textSizes = 1...4
+    public static let graphicsLevels = 0...10
+    public static let touchMovements = [0, 5, 1, 4]
+    public static let touchCameras = [0, 1, 2]
     static let prefix = "GlobalBasicSettings_"
     nonisolated(unsafe) static var lastReport = ""
 
@@ -32,10 +41,29 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
         if let textSize { out.append(("PreferredTextSize", String(textSize))) }
         if let menuTransparency { out.append(("PreferredTransparency", number(menuTransparency))) }
         if let haptics { out.append(("HapticStrength", number(haptics))) }
+        if let graphicsQuality {
+            out.append(("SavedQualityLevel", String(graphicsQuality)))
+            out.append(("GraphicsQualityLevel", String(graphicsQuality)))
+        }
+        if let graphicsMode { out.append(("GraphicsOptimizationMode", String(graphicsMode))) }
+        if let touchMovement {
+            out.append(("TouchMovementMode", String(touchMovement)))
+            out.append(("TouchMovementChanged", "true"))
+        }
+        if let touchCamera {
+            out.append(("TouchCameraMovementMode", String(touchCamera)))
+            out.append(("TouchCameraMovementChanged", "true"))
+        }
+        if let chatTranslation { out.append(("ChatTranslationEnabled", chatTranslation ? "true" : "false")) }
+        if let voiceVolume { out.append(("VoiceChatVolume", number(voiceVolume))) }
         return out
     }
 
-    public var count: Int { values.count }
+    public var count: Int {
+        [framerateCap, textSize, graphicsQuality, graphicsMode, touchMovement, touchCamera].compactMap { $0 }.count
+            + [performanceStats, reducedMotion, cameraInverted, vignette, chatTranslation].compactMap { $0 }.count
+            + [masterVolume, menuTransparency, haptics, voiceVolume].compactMap { $0 }.count
+    }
 
     func number(_ value: Double) -> String { String(format: "%g", min(max(value, 0), 1)) }
 
@@ -69,7 +97,7 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
                 let missing = settings.values.filter { !set($0.0, $0.1, in: &text) }.map(\.0)
                 if text != original { try text.write(to: file, atomically: true, encoding: .utf8) }
                 written += 1
-                notes.append("\(container.lastPathComponent): \(settings.count - missing.count) set" + (missing.isEmpty ? "" : ", not in file: \(missing.joined(separator: " "))"))
+                notes.append("\(container.lastPathComponent): \(settings.values.count - missing.count) values set" + (missing.isEmpty ? "" : ", not in file: \(missing.joined(separator: " "))"))
             } catch {
                 Log.error("RobloxSettings::apply", error)
             }
