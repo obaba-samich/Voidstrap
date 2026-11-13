@@ -18,6 +18,19 @@ struct RobloxSettingsView: View {
                 }
             }
 
+            SectionTitle(text: "Graphics")
+            Card {
+                choice("dial.medium", "Graphics quality", "Automatic lets Roblox pick", ["Automatic"] + (1...10).map(String.init),
+                       model.robloxSettings.graphicsQuality ?? 0) {
+                    model.robloxSettings.graphicsQuality = $0
+                }
+                RowDivider()
+                choice("sparkles", "Graphics mode", "Trade detail for smoother play", ["Performance", "Balanced", "Quality"],
+                       model.robloxSettings.graphicsMode ?? 1) {
+                    model.robloxSettings.graphicsMode = $0
+                }
+            }
+
             SectionTitle(text: "Display")
             Card {
                 choice("textformat.size", "Text size", "Size of Roblox menus and chat", ["Medium", "Large", "Larger", "Largest"],
@@ -35,6 +48,16 @@ struct RobloxSettingsView: View {
 
             SectionTitle(text: "Controls and sound")
             Card {
+                choice("hand.draw", "Movement", "How you move on the touch screen", ["Default", "Dynamic thumbstick", "Thumbstick", "Tap to move"],
+                       RobloxSettings.touchMovements.firstIndex(of: model.robloxSettings.touchMovement ?? 0) ?? 0) {
+                    model.robloxSettings.touchMovement = RobloxSettings.touchMovements[$0]
+                }
+                RowDivider()
+                choice("camera", "Camera", "How the camera follows you", ["Default", "Classic", "Follow"],
+                       RobloxSettings.touchCameras.firstIndex(of: model.robloxSettings.touchCamera ?? 0) ?? 0) {
+                    model.robloxSettings.touchCamera = RobloxSettings.touchCameras[$0]
+                }
+                RowDivider()
                 toggle("arrow.up.arrow.down", "Invert camera", "Flips up and down camera movement", model.robloxSettings.cameraInverted ?? false) {
                     model.robloxSettings.cameraInverted = $0
                 }
@@ -42,8 +65,18 @@ struct RobloxSettingsView: View {
                 Row(symbol: "speaker.wave.2", title: "Volume", detail: "Roblox master volume") { EmptyView() }
                 slider(model.robloxSettings.masterVolume ?? 1) { model.robloxSettings.masterVolume = $0 }
                 RowDivider()
+                Row(symbol: "mic", title: "Voice chat volume", detail: "How loud other players' voices are") { EmptyView() }
+                slider(model.robloxSettings.voiceVolume ?? 1) { model.robloxSettings.voiceVolume = $0 }
+                RowDivider()
                 Row(symbol: "iphone.radiowaves.left.and.right", title: "Haptics", detail: "Vibration strength") { EmptyView() }
                 slider(model.robloxSettings.haptics ?? 1) { model.robloxSettings.haptics = $0 }
+            }
+
+            SectionTitle(text: "Chat")
+            Card {
+                toggle("character.bubble", "Translate chat", "Shows chat in your language", model.robloxSettings.chatTranslation ?? true) {
+                    model.robloxSettings.chatTranslation = $0
+                }
             }
 
             SectionTitle(text: "Comfort")

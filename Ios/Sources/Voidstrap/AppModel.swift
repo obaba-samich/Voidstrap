@@ -191,6 +191,7 @@ final class AppModel: ObservableObject {
                     _ = try LiveInstall.install(ipa: result.output) { text, value in model.report(text, value) }
                     return true
                 }.value
+                RobloxSettings.apply(await model.robloxSettings)
             }
             await MainActor.run {
                 model.patched = result.output
