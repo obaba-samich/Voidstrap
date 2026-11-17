@@ -530,7 +530,7 @@ sh scripts/sync-version.sh
 xtool dev build --configuration release --ipa
 ```
 
-The IPA is saved in `Ios/xtool`. `sync-version.sh` copies the version from `Directory.Build.props` into `Info.plist`. Install the IPA with LiveContainer, SideStore or another sideloader, which signs it for your device.
+The IPA is saved in `Ios/xtool`. Every push that changes `Ios` also builds the IPA on GitHub with `.github/workflows/ios.yml`. Download it from the run's `voidstrap-ios` artifact, which includes a `SHA256SUMS` file. `sync-version.sh` copies the version from `Directory.Build.props` into `Info.plist`. Install the IPA with LiveContainer, SideStore or another sideloader, which signs it for your device.
 
 **Building through publish-all.ps1**
 
@@ -544,7 +544,7 @@ On Linux or macOS, use `pwsh -NoProfile -File ./publish-all.ps1 -Only ios -NoPau
 
 **Roblox settings on iOS**
 
-Roblox on iOS reads `ClientAppSettings.json` but denies every FastFlag in it, so the iOS app changes Roblox's own settings instead: frame rate limit, performance stats and reduced motion. Voidstrap edits only those values in `Library/Application Support/GlobalBasicSettings_13.xml` each time it launches Roblox. This needs Roblox installed in LiveContainer next to Voidstrap, since iOS keeps other apps' files private. Launch Roblox there once so its settings file exists. Nothing is injected into Roblox.
+Roblox on iOS reads `ClientAppSettings.json` but denies every FastFlag in it, so the iOS app changes Roblox's own settings instead: frame rate limit, performance stats, graphics quality, text size, menu transparency, movement and camera modes, inverted camera, volume, voice and party voice volume, haptics, controller camera speed, chat translation and reduced motion. Voidstrap edits only those values in `Library/Application Support/GlobalBasicSettings_13.xml` when you change a setting, when you tap **Apply Roblox** and when it launches Roblox. This needs Roblox installed in LiveContainer next to Voidstrap, since iOS keeps other apps' files private. Launch Roblox there once so its settings file exists, and close it before changing settings. Games can still lock the movement and camera modes. Nothing is injected into Roblox.
 
 </details>
 
