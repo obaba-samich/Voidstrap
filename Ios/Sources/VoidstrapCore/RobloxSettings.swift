@@ -6,22 +6,23 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
     public var reducedMotion: Bool?
     public var masterVolume: Double?
     public var cameraInverted: Bool?
-    public var vignette: Bool?
     public var textSize: Int?
     public var menuTransparency: Double?
-    public var haptics: Double?
+    public var hapticsOn: Bool?
     public var graphicsQuality: Int?
-    public var graphicsMode: Int?
     public var touchMovement: Int?
     public var touchCamera: Int?
     public var chatTranslation: Bool?
     public var voiceVolume: Double?
+    public var partyVolume: Double?
+    public var controllerSensitivity: Double?
 
     public static let framerateCaps = [-1, 30, 60, 120]
     public static let textSizes = 1...4
     public static let graphicsLevels = 0...10
     public static let touchMovements = [0, 5, 1, 4]
     public static let touchCameras = [0, 1, 2]
+    public static let controllerSensitivities = [0.2, 0.5, 1, 1.5, 2, 3, 4]
     static let prefix = "GlobalBasicSettings_"
     nonisolated(unsafe) static var lastReport = ""
 
@@ -37,15 +38,10 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
         if let reducedMotion { out.append(("ReducedMotion", reducedMotion ? "true" : "false")) }
         if let masterVolume { out.append(("MasterVolume", number(masterVolume))) }
         if let cameraInverted { out.append(("CameraYInverted", cameraInverted ? "true" : "false")) }
-        if let vignette { out.append(("VignetteEnabled", vignette ? "true" : "false")) }
         if let textSize { out.append(("PreferredTextSize", String(textSize))) }
         if let menuTransparency { out.append(("PreferredTransparency", number(menuTransparency))) }
-        if let haptics { out.append(("HapticStrength", number(haptics))) }
-        if let graphicsQuality {
-            out.append(("SavedQualityLevel", String(graphicsQuality)))
-            out.append(("GraphicsQualityLevel", String(graphicsQuality)))
-        }
-        if let graphicsMode { out.append(("GraphicsOptimizationMode", String(graphicsMode))) }
+        if let hapticsOn { out.append(("HapticStrength", hapticsOn ? "1" : "0")) }
+        if let graphicsQuality { out.append(("SavedQualityLevel", String(min(max(graphicsQuality, 0), 10)))) }
         if let touchMovement {
             out.append(("TouchMovementMode", String(touchMovement)))
             out.append(("TouchMovementChanged", "true"))
@@ -56,13 +52,17 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
         }
         if let chatTranslation { out.append(("ChatTranslationEnabled", chatTranslation ? "true" : "false")) }
         if let voiceVolume { out.append(("VoiceChatVolume", number(voiceVolume))) }
+        if let partyVolume { out.append(("PartyVoiceVolume", number(partyVolume))) }
+        if let controllerSensitivity {
+            out.append(("GamepadCameraSensitivity", String(format: "%g", min(max(controllerSensitivity, 0.2), 4))))
+        }
         return out
     }
 
     public var count: Int {
-        [framerateCap, textSize, graphicsQuality, graphicsMode, touchMovement, touchCamera].compactMap { $0 }.count
-            + [performanceStats, reducedMotion, cameraInverted, vignette, chatTranslation].compactMap { $0 }.count
-            + [masterVolume, menuTransparency, haptics, voiceVolume].compactMap { $0 }.count
+        [framerateCap, textSize, graphicsQuality, touchMovement, touchCamera].compactMap { $0 }.count
+            + [performanceStats, reducedMotion, cameraInverted, hapticsOn, chatTranslation].compactMap { $0 }.count
+            + [masterVolume, menuTransparency, voiceVolume, partyVolume, controllerSensitivity].compactMap { $0 }.count
     }
 
     func number(_ value: Double) -> String { String(format: "%g", min(max(value, 0), 1)) }

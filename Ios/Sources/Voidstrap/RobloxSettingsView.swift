@@ -20,14 +20,9 @@ struct RobloxSettingsView: View {
 
             SectionTitle(text: "Graphics")
             Card {
-                choice("dial.medium", "Graphics quality", "Automatic lets Roblox pick", ["Automatic"] + (1...10).map(String.init),
+                choice("dial.medium", "Graphics quality", "Automatic lets Roblox pick, 1 is fastest", ["Automatic"] + (1...10).map(String.init),
                        model.robloxSettings.graphicsQuality ?? 0) {
                     model.robloxSettings.graphicsQuality = $0
-                }
-                RowDivider()
-                choice("sparkles", "Graphics mode", "Trade detail for smoother play", ["Performance", "Balanced", "Quality"],
-                       model.robloxSettings.graphicsMode ?? 1) {
-                    model.robloxSettings.graphicsMode = $0
                 }
             }
 
@@ -40,10 +35,6 @@ struct RobloxSettingsView: View {
                 RowDivider()
                 Row(symbol: "square.on.square", title: "Menu transparency", detail: "How see through Roblox menus are") { EmptyView() }
                 slider(model.robloxSettings.menuTransparency ?? 1) { model.robloxSettings.menuTransparency = $0 }
-                RowDivider()
-                toggle("circle.dashed", "Vignette", "Darkens the screen edges in first person", model.robloxSettings.vignette ?? true) {
-                    model.robloxSettings.vignette = $0
-                }
             }
 
             SectionTitle(text: "Controls and sound")
@@ -68,8 +59,18 @@ struct RobloxSettingsView: View {
                 Row(symbol: "mic", title: "Voice chat volume", detail: "How loud other players' voices are") { EmptyView() }
                 slider(model.robloxSettings.voiceVolume ?? 1) { model.robloxSettings.voiceVolume = $0 }
                 RowDivider()
-                Row(symbol: "iphone.radiowaves.left.and.right", title: "Haptics", detail: "Vibration strength") { EmptyView() }
-                slider(model.robloxSettings.haptics ?? 1) { model.robloxSettings.haptics = $0 }
+                Row(symbol: "person.2.wave.2", title: "Party voice volume", detail: "How loud your party's voices are") { EmptyView() }
+                slider(model.robloxSettings.partyVolume ?? 1) { model.robloxSettings.partyVolume = $0 }
+                RowDivider()
+                toggle("iphone.radiowaves.left.and.right", "Haptics", "Vibration in games that use it", model.robloxSettings.hapticsOn ?? true) {
+                    model.robloxSettings.hapticsOn = $0
+                }
+                RowDivider()
+                choice("gamecontroller", "Controller camera speed", "For a game controller connected to your phone",
+                       ["Slowest", "Slow", "Default", "Faster", "Fast", "Very fast", "Fastest"],
+                       RobloxSettings.controllerSensitivities.firstIndex(of: model.robloxSettings.controllerSensitivity ?? 1) ?? 2) {
+                    model.robloxSettings.controllerSensitivity = RobloxSettings.controllerSensitivities[$0]
+                }
             }
 
             SectionTitle(text: "Chat")
@@ -86,7 +87,7 @@ struct RobloxSettingsView: View {
                 }
             }
 
-            Text(loc: "Roblox on iOS ignores FastFlags, so Voidstrap changes Roblox's own settings instead. Open Roblox once first so its settings file exists, and close Roblox before changing settings here.")
+            Text(loc: "Roblox on iOS ignores FastFlags, so Voidstrap changes Roblox's own settings instead. Open Roblox once first so its settings file exists, and close Roblox before changing settings here. Some games lock movement and camera modes.")
                 .font(.system(size: 13))
                 .foregroundColor(Palette.textSecondary)
                 .padding(.horizontal, 4)
