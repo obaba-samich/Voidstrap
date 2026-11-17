@@ -19,7 +19,6 @@ public struct RobloxSettings: Codable, Equatable, Sendable {
 
     public static let framerateCaps = [-1, 30, 60, 120]
     public static let textSizes = 1...4
-    public static let graphicsLevels = 0...10
     public static let touchMovements = [0, 5, 1, 4]
     public static let touchCameras = [0, 1, 2]
     public static let controllerSensitivities = [0.2, 0.5, 1, 1.5, 2, 3, 4]
